@@ -1,0 +1,122 @@
+<html>
+    <head>
+        <title>{{ title }}</title>
+        <!-- tailwinds css -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap');
+            .text-body{
+                font-family: 'Source Sans Pro';
+            }
+        </style>
+    </head>
+    <body class="bg-gray-900 text-gray-50 text-body">
+        <!-- upload dataset -->
+        <section name="upload_data" class="flex h-screen">
+            <div class="m-auto">
+                <img src="https://cdni.iconscout.com/illustration/premium/thumb/machine-learning-3993970-3307785.png" class="m-auto w-80">
+                <h1 class="text-5xl font-bold">Auto Sentiment Analysis</h1>
+                <form action = "{{ url_for('upload_dataset') }}" method = "post" enctype="multipart/form-data" class="mt-8 space-x-44">
+                    <input type="file" name="dataset" class="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-800 hover:file:bg-pink-200">
+                    <button type="submit" class="px-4 py-2 text-sm font-semibold text-blue-800 rounded-full bg-blue-50 hover:bg-blue-200">Upload</button>
+                </form>
+             </div>
+        </section>
+        {% if df %}
+            <!-- show data -->
+            <section class="p-20 mb-4">
+                <h1 class="mb-8 text-3xl font-bold text-center"><span class="text-cyan-400">#</span><span class="text-pink-400">.</span> Show Top 5 Data</h1>
+                <table class="border-collapse table-fixed m-auto">
+                    <thead>
+                        <tr>
+                            {% for i in df.keys() %}
+                                <th class="p-3 border border-slate-600 bg-slate-700">{{ i }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in range(5) %}
+                            <tr>
+                            {% for j in df.keys() %}
+                                <td class="p-2 border border-slate-600">{{ df[j][i] }}</td>
+                            {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+            <!-- configure of data and algorithm -->
+            <section class="p-20 mb-4">
+                <h1 class="mb-8 text-3xl font-bold text-center"><span class="text-cyan-400">#</span><span class="text-pink-400">.</span> Configuration</h1>
+                <form action = "{{ url_for('conf', path_df=path_df) }}" method = "post">
+                    <div class="grid w-3/5 grid-cols-2 m-auto mb-10 space-x-8">
+                        <!-- choose feature data -->
+                        <div>
+                            <h2 class="text-lg font-bold">Feature Data</h2>
+                            <p class="mb-3 text-gray-300">Feature data merupakan data/kolom yang dijadikan sebagai fitur. Pilihlah kolom teks yang memiliki kalimat opini.</p>
+                            <!-- itterative column from dataframe uploaded -->
+                            <select name="feature_data" class="p-1 mr-4 bg-gray-600 rounded w-72 text-gray-50">
+                                {% for i in df.keys() %}
+                                    <option value="{{ i }}">{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <!-- choose class data -->
+                        <div>
+                            <h2 for="feature_data" class="text-lg font-bold">Class Data</h2>
+                            <p class="mb-3 text-gray-300">Class data merupakan label dari kalimat. Pilihlah kolom yang memiliki nilai sentiment positif, negatif, atau netral</p>
+                            <!-- itterative column from dataframe uploaded -->
+                            <select name="class_data" class="p-1 bg-gray-600 rounded w-72 text-gray-50">
+                                {% for i in df.keys() %}
+                                    <option value="{{ i }}">{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <!-- choose algorithm you want -->
+                    <h2 class="mb-4 text-lg font-bold text-center">Choose Algorithm</h2>
+                    <div class="grid w-5/6 grid-cols-6 mx-auto">
+                        {% for i in classifier %}
+                            <div class="text-center">
+                                <input type="checkbox" name="classifier" value="{{ i }}">
+                                <label for="{{ i }}">{{ i }}</label><br>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="w-full mt-6 text-center">
+                        <button type="submit" class="px-12 py-2 font-semibold text-blue-800 rounded-full bg-blue-50 hover:bg-blue-200">Submit</button>
+                    </div>
+                </form>
+            </section>
+            <section class="p-20 mb-4">
+                <!-- result of algorithm used -->
+                {% if results %}
+                    <h1 class="mb-8 text-3xl font-bold text-center"><span class="text-cyan-400">#</span><span class="text-pink-400">.</span> Result</h1>
+                    <table class="border-collapse table-fixed m-auto">
+                        <thead>
+                            <tr>
+                                {% for i in results.keys() %}
+                                    <th class="p-3 border border-slate-600 bg-slate-700">{{ i }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(results['Classifier']|length) %}
+                                <tr>
+                                {% for j in results.keys() %}
+                                    <td class="p-2 border text-center border-slate-600">{{ results[j][i] }}</td>
+                                {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </section>
+        {% endif %}
+        <!-- footer -->
+        <footer class="p-5 text-center">
+            <a href="https://github.com/technisekai" class="font-semibold text-base">Created by Widi Afandi</a>
+            <h2 class="text-base">@2022</h2>
+        </footer>
+    </body>
+</html>
